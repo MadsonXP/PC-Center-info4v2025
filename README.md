@@ -2,7 +2,7 @@
 será utilizado para trabalhar a disciplina de programação para internet  
 
 
-Um breve contexto sobre o projeto:
+#  Um breve contexto sobre o projeto:
 
 Em uma cidade com muitos treinadores Pokémon, há um sistema utilizado para
 gerenciar e organizar as trocas de Pokémon entre os moradores. Atualmente, os
