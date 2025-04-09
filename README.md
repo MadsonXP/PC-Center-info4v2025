@@ -2,4 +2,7 @@
 será utilizado para trabalhar a disciplina de programação para internet  
 
 
-contexto é esse
+Um breve contexto sobre o projeto:
+
+
+
