@@ -18,4 +18,6 @@ treinadores a encontrarem os Pokémon que procuram e a garantir que as trocas se
 registradas corretamente.
 
 
+### interação 1
+
 
