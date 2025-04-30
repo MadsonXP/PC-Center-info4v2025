@@ -18,6 +18,10 @@ treinadores a encontrarem os Pokémon que procuram e a garantir que as trocas se
 registradas corretamente.
 
 
-### interação 1
+### interação 1:
+
+
+Nesse primeiro momento, como uma prova de conceito e viabilidade arquitetural. trabalharemos a necessidade do sistema em armazenar dados dos pokemon em diferentes centros.
+
 
 
