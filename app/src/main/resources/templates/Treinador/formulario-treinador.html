@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Treinador</title>
+</head>
+<body>
+    <h1>Cadastro de Treinador</h1>
+
+    <form th:action="@{/treinadores}" th:object="${treinador}" method="post">
+        <div>
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" th:field="*{nome}" required maxlength="100"/>
+            <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+        </div>
+
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" th:field="*{email}" required maxlength="100"/>
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </div>
+
+        <div>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" th:field="*{senha}" required maxlength="255"/>
+            <span th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+        </div>
+
+        <div>
+            <label for="dataCadastro">Data de Cadastro:</label>
+            <input type="date" id="dataCadastro" th:field="*{dataCadastro}" required/>
+            <span th:if="${#fields.hasErrors('dataCadastro')}" th:errors="*{dataCadastro}"></span>
+        </div>
+
+        <div>
+            <button type="submit">Salvar</button>
+        </div>
+    </form>
+
+    <a th:href="@{/treinadores}">Voltar à lista</a>
+</body>
+</html>

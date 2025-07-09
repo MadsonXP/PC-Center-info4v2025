@@ -19,7 +19,7 @@ import java.time.LocalDate; // Importe para usar LocalDate para a data de cadast
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Treinador {
+public class CadastroTreinador {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

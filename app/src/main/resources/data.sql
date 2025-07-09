@@ -1,10 +1,12 @@
+
+
 -- Inserir dados de exemplo em 'treinadores'
 INSERT INTO treinadores (nome, email, senha, data_cadastro) VALUES
 ('Ash Ketchum', 'ash.ketchum@example.com', 'senhaHashAsh123', '1997-04-01'),
 ('Misty Waterflower', 'misty.w@example.com', 'senhaHashMisty456', '1998-07-15'),
 ('Brock Stone', 'brock.s@example.com', 'senhaHashBrock789', '1997-04-01');
 
--- Inserir dados de exemplo em 'pokemons'
+//* -- Inserir dados de exemplo em 'pokemons'
 -- Assumindo que os IDs dos treinadores são 1, 2 e 3, respectivamente,
 -- gerados automaticamente pela coluna PRIMARY KEY AUTO_INCREMENT.
 INSERT INTO pokemons (treinador_id, nome, tipo, habilidade, nivel) VALUES
@@ -30,4 +32,4 @@ INSERT INTO solicitacoes_troca (treinador_solicitante_id, pokemon_oferecido_id, 
 -- Misty (ID 2) oferece Psyduck (ID 4) para Brock (ID 3) sem pedir um Pokémon específico em troca
 (2, 4, 3, NULL, 'PENDENTE', '2024-07-01 11:30:00'),
 -- Brock (ID 3) oferece Geodude (ID 6) para Ash (ID 1) por Pikachu (ID 1)
-(3, 6, 1, 1, 'RECUSADA', '2024-07-01 14:00:00');
+(3, 6, 1, 1, 'RECUSADA', '2024-07-01 14:00:00'); *//
