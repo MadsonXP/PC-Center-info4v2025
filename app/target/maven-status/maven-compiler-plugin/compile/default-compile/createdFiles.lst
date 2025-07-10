@@ -1,0 +1,5 @@
+br\edu\ifrn\PcCenter\Application.class
+br\edu\ifrn\PcCenter\web\controladores\TreinadorControle.class
+br\edu\ifrn\PcCenter\OlaSpringBoot.class
+br\edu\ifrn\PcCenter\persistencia\repositorio\TreinadorRepo.class
+br\edu\ifrn\PcCenter\persistencia\modelo\CadastroTreinador.class

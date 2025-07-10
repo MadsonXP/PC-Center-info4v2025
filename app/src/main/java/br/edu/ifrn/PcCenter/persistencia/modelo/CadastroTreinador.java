@@ -1,4 +1,4 @@
-package br.edu.ifrn.PcCenter.modelo;
+package br.edu.ifrn.PcCenter.persistencia.modelo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,11 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate; // Importe para usar LocalDate para a data de cadastro
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "treinadores") // Nome da tabela no banco de dados
+@Table(name = "treinadores")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -31,10 +30,9 @@ public class CadastroTreinador {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "senha", nullable = false, length = 255) // Para armazenar o hash da senha
+    @Column(name = "senha", nullable = false, length = 255)
     private String senha;
 
     @Column(name = "data_cadastro", nullable = false)
-    private LocalDate dataCadastro; // Usando LocalDate para a data
-
+    private LocalDate dataCadastro;
 }
