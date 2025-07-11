@@ -3,40 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro de Treinador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Estilos gerais para o corpo da página */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            flex-direction: column; /* Organiza os itens em coluna */
+        }
+
+        /* Container principal para o formulário */
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Espaço abaixo do formulário */
+        }
+        
+        /* Estilo do título do formulário */
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        /* Container para cada campo do formulário (label + input) */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Estilo das labels */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Estilo dos campos de input */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        /* Efeito de foco nos inputs */
+        input:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+        }
+
+        /* Estilo para as mensagens de erro de validação */
+        .error-message {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Estilo do botão de salvar */
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        /* Efeito hover no botão */
+        button[type="submit"]:hover {
+            background-color: #155ab6;
+        }
+
+        /* Estilo do link para voltar */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            display: block;
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Media Query para responsividade em telas menores */
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Cadastro de Treinador</h1>
+    <div class="form-container">
+        <h1>Cadastro de Treinador</h1>
 
-    <form th:action="@{/treinadores}" th:object="${treinador}" method="post">
-        <div>
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" th:field="*{nome}" required maxlength="100"/>
-            <span th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
-        </div>
+        <form th:action="@{/treinadores}" th:object="${treinador}" method="post">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" th:field="*{nome}" required maxlength="100"/>
+                <span class="error-message" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+            </div>
 
-        <div>
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" th:field="*{email}" required maxlength="100"/>
-            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-        </div>
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" th:field="*{email}" required maxlength="100"/>
+                <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
 
-        <div>
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" th:field="*{senha}" required maxlength="255"/>
-            <span th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
-        </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" th:field="*{senha}" required maxlength="255"/>
+                <span class="error-message" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+            </div>
 
-        <div>
-            <label for="dataCadastro">Data de Cadastro:</label>
-            <input type="date" id="dataCadastro" th:field="*{dataCadastro}" required/>
-            <span th:if="${#fields.hasErrors('dataCadastro')}" th:errors="*{dataCadastro}"></span>
-        </div>
+            <div class="form-group">
+                <label for="dataCadastro">Data de Cadastro:</label>
+                <input type="date" id="dataCadastro" th:field="*{dataCadastro}" required/>
+                <span class="error-message" th:if="${#fields.hasErrors('dataCadastro')}" th:errors="*{dataCadastro}"></span>
+            </div>
 
-        <div>
-            <button type="submit">Salvar</button>
-        </div>
-    </form>
+            <div class="form-group">
+                <button type="submit">Salvar</button>
+            </div>
+        </form>
 
-    <a th:href="@{/treinadores}">Voltar à lista</a>
+        <a class="back-link" th:href="@{/treinadores}">Voltar à lista</a>
+    </div>
 </body>
 </html>
