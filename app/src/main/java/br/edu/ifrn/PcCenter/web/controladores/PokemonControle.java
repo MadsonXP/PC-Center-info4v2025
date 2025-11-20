@@ -12,8 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.util.Collections; // Import necessário
-import java.util.Optional; // Import necessário
+import java.util.Collections;
+import java.util.List; 
 
 @Controller
 @RequestMapping("/pokemons")
@@ -32,10 +32,21 @@ public class PokemonControle {
             .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado (" + emailLogado + ") não encontrado no banco de dados."));
     }
 
+    // MÉTODO ATUALIZADO: Separa Pokémons em duas listas
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("nomeUsuario", getTreinadorLogado().getNome());
-        model.addAttribute("pokemons", pokemonRepo.findAll());
+        CadastroTreinador treinadorLogado = getTreinadorLogado();
+        Long treinadorId = treinadorLogado.getId();
+        
+        // 1. Busca os Pokémons do próprio Treinador
+        List<CadastroPokemon> meusPokemons = pokemonRepo.findByTreinadorId(treinadorId);
+        // 2. Busca os Pokémons de outros Treinadores
+        List<CadastroPokemon> outrosPokemons = pokemonRepo.findByTreinadorIdNot(treinadorId);
+        
+        model.addAttribute("nomeUsuario", treinadorLogado.getNome());
+        model.addAttribute("meusPokemons", meusPokemons);
+        model.addAttribute("outrosPokemons", outrosPokemons);
+        
         return "Pokemon/lista-pokemon";
     }
 
@@ -43,11 +54,10 @@ public class PokemonControle {
     public String formulario(Model model) {
         CadastroTreinador treinadorLogado = getTreinadorLogado();
         
-        // 1. OBTÉM O OBJETO E NOME
         model.addAttribute("nomeUsuario", treinadorLogado.getNome());
         model.addAttribute("pokemon", new CadastroPokemon());
         
-        // 2. CORREÇÃO CRÍTICA: Envia UMA LISTA contendo APENAS o usuário logado para o formulário
+        // Envia apenas o treinador logado para o binding no formulário (campo oculto)
         model.addAttribute("treinadores", Collections.singletonList(treinadorLogado));
         
         return "Pokemon/formulario-pokemon";
@@ -56,22 +66,18 @@ public class PokemonControle {
     @PostMapping
     public String salvar(@Valid @ModelAttribute("pokemon") CadastroPokemon pokemon, BindingResult result) {
         
-        // CORREÇÃO CRÍTICA: Se a validação falhar, precisamos re-injetar o nome e a lista de treinadores
         if (result.hasErrors()) {
             CadastroTreinador treinadorLogado = getTreinadorLogado();
+            // Recarrega o nome e a lista de treinadores em caso de erro de validação
             result.getModel().put("nomeUsuario", treinadorLogado.getNome());
             result.getModel().put("treinadores", Collections.singletonList(treinadorLogado));
             return "Pokemon/formulario-pokemon";
         }
         
-        // A lógica de associação (pokemon.setTreinador(treinadorLogado)) foi removida daqui, 
-        // pois o Thymeleaf a fará automaticamente via binding (th:field="*{treinador}")
-        
         pokemonRepo.save(pokemon);
         return "redirect:/pokemons";
     }
     
-    // ... (Métodos editar e excluir permanecem os mesmos) ...
     @GetMapping("/{id}/editar")
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("nomeUsuario", getTreinadorLogado().getNome());
@@ -79,13 +85,15 @@ public class PokemonControle {
             .orElseThrow(() -> new IllegalArgumentException("ID de Pokémon inválido:" + id));
         
         model.addAttribute("pokemon", pokemon);
-        // CRÍTICA: Enviamos todos os treinadores para a edição (visão de admin)
+        // Em edição, pode-se listar todos os treinadores (visão de administrador/proprietário)
         model.addAttribute("treinadores", treinadorRepo.findAll()); 
         return "Pokemon/formulario-pokemon";
     }
 
     @GetMapping("/{id}/excluir")
     public String excluir(@PathVariable Long id) {
+        // NOTA DE SEGURANÇA: Aqui deveria haver uma verificação 
+        // se o Pokémon pertence ao usuário logado. 
         pokemonRepo.deleteById(id);
         return "redirect:/pokemons";
     }

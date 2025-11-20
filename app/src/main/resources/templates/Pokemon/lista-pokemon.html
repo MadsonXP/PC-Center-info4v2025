@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Lista de Pokémons</title>
@@ -19,32 +19,58 @@
         <a th:href="@{/pokemons/novo}" class="btn btn-success">Cadastrar Novo Pokémon</a>
         <a th:href="@{/}" class="btn btn-secondary">Voltar ao Menu Principal</a>
     </div>
-    
+
+    <h2 class="mt-4 mb-3 text-primary">Meus Pokémons para Troca</h2>
+
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th>ID</th>
             <th>Nome</th>
             <th>Tipo</th>
             <th>Nível</th>
-            <th>Treinador</th>
+            <th>Habilidade</th>
             <th>Ações</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="pokemon : ${pokemons}">
-            <td th:text="${pokemon.id}">ID</td>
+        <tr th:each="pokemon : ${meusPokemons}">
             <td th:text="${pokemon.nome}">Nome</td>
             <td th:text="${pokemon.tipo}">Tipo</td>
             <td th:text="${pokemon.nivel}">Nível</td>
-            <td th:text="${pokemon.treinador?.nome}">Treinador</td> 
+            <td th:text="${pokemon.habilidade}">Habilidade</td>
             <td>
                 <a th:href="@{/pokemons/{id}/editar(id=${pokemon.id})}" class="btn btn-sm btn-info text-white">Editar</a>
                 <a th:href="@{/pokemons/{id}/excluir(id=${pokemon.id})}" class="btn btn-sm btn-danger">Excluir</a>
             </td>
         </tr>
-        <tr th:if="${#lists.isEmpty(pokemons)}">
-            <td colspan="6" class="text-center">Nenhum Pokémon cadastrado.</td>
+        <tr th:if="${#lists.isEmpty(meusPokemons)}">
+            <td colspan="5" class="text-center">Você ainda não cadastrou nenhum Pokémon.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mt-5 mb-3 text-success">Pokémons de Outros Treinadores</h2>
+    
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Nível</th>
+            <th>Habilidade</th>
+            <th>Treinador</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pokemon : ${outrosPokemons}">
+            <td th:text="${pokemon.nome}">Nome</td>
+            <td th:text="${pokemon.tipo}">Tipo</td>
+            <td th:text="${pokemon.nivel}">Nível</td>
+            <td th:text="${pokemon.habilidade}">Habilidade</td>
+            <td th:text="${pokemon.treinador?.nome}">Treinador</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(outrosPokemons)}">
+            <td colspan="5" class="text-center">Nenhum Pokémon de outros treinadores disponível.</td>
         </tr>
         </tbody>
     </table>
