@@ -3,7 +3,7 @@ package br.edu.ifrn.PcCenter.web.controladores;
 import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 import br.edu.ifrn.PcCenter.persistencia.repositorio.TreinadorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // <<--- NOVO IMPORT
+import org.springframework.security.crypto.password.PasswordEncoder; // Import necessário
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,8 +17,9 @@ public class TreinadorControle {
     @Autowired
     private TreinadorRepo treinadorRepo;
     
+    // INJEÇÃO CRÍTICA: O Spring Security fornece esta instância
     @Autowired
-    private PasswordEncoder passwordEncoder; // <<--- NOVO: Injeção do Codificador
+    private PasswordEncoder passwordEncoder; 
 
     @GetMapping
     public String listar(Model model) {
@@ -42,7 +43,7 @@ public class TreinadorControle {
             return "Treinador/formulario-treinador";
         }
 
-        // CORREÇÃO CRÍTICA: Codifica a senha antes de salvar no banco de dados
+        // CORREÇÃO DEFINITIVA: Codifica a senha antes de salvar
         String senhaPura = treinador.getSenha();
         String senhaCodificada = passwordEncoder.encode(senhaPura);
         treinador.setSenha(senhaCodificada);
@@ -56,6 +57,7 @@ public class TreinadorControle {
         CadastroTreinador treinador = treinadorRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("ID de Treinador inválido:" + id));
         
+        // Remove a senha codificada do modelo para não expor ou quebrar o formulário
         treinador.setSenha(null); 
         
         model.addAttribute("treinador", treinador);
