@@ -30,20 +30,23 @@ public class ListaInteresseControle {
     @GetMapping("/novo")
     public String formulario(Model model) {
         model.addAttribute("interesse", new ListaInteresse());
-        // RESTAURADO: Enviamos todos os treinadores para o dropdown
-        model.addAttribute("treinadores", treinadorRepo.findAll()); 
+        // REMOÇÃO LOGÍSTICA: Não precisamos listar treinadores
         return "Interesse/formulario-interesse"; 
     }
 
     @PostMapping
     public String salvar(@Valid @ModelAttribute("interesse") ListaInteresse interesse, BindingResult result) {
+        
+        // CORREÇÃO LOGÍSTICA/VALIDAÇÃO: Associa o Treinador ID 1 antes de checar erros
+        Long treinadorLogadoId = 1L; 
+        CadastroTreinador treinadorLogado = treinadorRepo.findById(treinadorLogadoId)
+            .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado (ID " + treinadorLogadoId + ") não encontrado!"));
+
+        interesse.setTreinador(treinadorLogado);
+        
         if (result.hasErrors()) {
-            // Se houver erro, recarregamos a lista de treinadores
-            result.getModel().put("treinadores", treinadorRepo.findAll());
             return "Interesse/formulario-interesse";
         }
-        
-        // REMOVIDO: A lógica de forçar o Treinador ID 1
 
         listaInteresseRepo.save(interesse);
         return "redirect:/interesses";

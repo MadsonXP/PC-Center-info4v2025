@@ -15,20 +15,6 @@
         <input type="hidden" th:field="*{id}" />
 
         <div class="mb-3">
-            <label for="treinador" class="form-label">Treinador:</label>
-            <select id="treinador" th:field="*{treinador}" class="form-select" required>
-                <option value="">Selecione um Treinador</option>
-                <option th:each="t : ${treinadores}" 
-                        th:value="${t.id}" 
-                        th:text="${t.nome}"
-                        th:selected="${pokemon.treinador != null and pokemon.treinador.id == t.id}">
-                    Nome do Treinador
-                </option>
-            </select>
-            <span class="text-danger" th:if="${#fields.hasErrors('treinador')}" th:errors="*{treinador}"></span>
-        </div>
-
-        <div class="mb-3">
             <label for="nome" class="form-label">Nome do Pokémon:</label>
             <input type="text" id="nome" th:field="*{nome}" class="form-control" required maxlength="100"/>
             <span class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
