@@ -18,14 +18,15 @@ public class TreinadorDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Busca o Treinador pelo e-mail
+        // 1. Busca o Treinador pelo e-mail
         CadastroTreinador treinador = treinadorRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Treinador não encontrado com e-mail: " + email));
 
-        // Converte o objeto Treinador para o formato UserDetails que o Spring entende
+        // 2. Converte o objeto Treinador para o formato UserDetails
+        // O construtor do Spring Security User espera: username (email), password (senha), e authorities (lista vazia)
         return new org.springframework.security.core.userdetails.User(
                 treinador.getEmail(), 
-                treinador.getSenha(), // A senha já está codificada no banco
+                treinador.getSenha(), // Pega a senha CODIFICADA do objeto
                 emptyList() 
         );
     }

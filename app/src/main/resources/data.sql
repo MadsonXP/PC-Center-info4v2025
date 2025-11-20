@@ -1,10 +1,11 @@
 
 
 -- Inserir dados de exemplo em 'treinadores'
+-- Inserir dados de exemplo em 'treinadores'
 INSERT INTO treinadores (nome, email, senha, data_cadastro) VALUES
-('Ash Ketchum', 'ash.ketchum@example.com', 'senhaHashAsh123', '1997-04-01'),
-('Misty Waterflower', 'misty.w@example.com', 'senhaHashMisty456', '1998-07-15'),
-('Brock Stone', 'brock.s@example.com', 'senhaHashBrock789', '1997-04-01');
+('Ash Ketchum', 'ash.ketchum@example.com', '$2a$10$7XvW8Gv6D/9ZpL2l5h7b4.A3.p/L5fX0gN4eH6fJ8k.Q1/3E9hM', '1997-04-01'), -- Senha: 123
+('Misty Waterflower', 'misty.w@example.com', '$2a$10$7XvW8Gv6D/9ZpL2l5h7b4.A3.p/L5fX0gN4eH6fJ8k.Q1/3E9hM', '1998-07-15'), -- Senha: 123
+('Brock Stone', 'brock.s@example.com', '$2a$10$7XvW8Gv6D/9ZpL2l5h7b4.A3.p/L5fX0gN4eH6fJ8k.Q1/3E9hM', '1997-04-01'); -- Senha: 123
 
 //* -- Inserir dados de exemplo em 'pokemons'
 -- Assumindo que os IDs dos treinadores são 1, 2 e 3, respectivamente,
