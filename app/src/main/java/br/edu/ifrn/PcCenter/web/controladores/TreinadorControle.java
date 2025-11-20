@@ -35,17 +35,22 @@ public class TreinadorControle {
 
     @PostMapping
     public String salvar(@Valid @ModelAttribute("treinador") CadastroTreinador treinador, BindingResult result) {
+        // Lógica de verificação de e-mail duplicado
+        if (treinadorRepo.findByEmail(treinador.getEmail()).isPresent()) {
+            result.rejectValue("email", "erro.duplicado", "Já existe um treinador com este e-mail");
+        }
+        
         if (result.hasErrors()) {
             return "Treinador/formulario-treinador";
         }
 
-        // CORREÇÃO ESSENCIAL: Codifica a senha antes de salvar
+        // CORREÇÃO ESSENCIAL: Codifica a senha antes de salvar no banco
         String senhaPura = treinador.getSenha();
         String senhaCodificada = passwordEncoder.encode(senhaPura);
         treinador.setSenha(senhaCodificada);
         
         treinadorRepo.save(treinador);
-        return "redirect:/treinadores"; // Redireciona para a lista (ou para a página de login)
+        return "redirect:/treinadores"; // Redireciona para a lista
     }
 
     @GetMapping("/{id}/editar")
@@ -53,7 +58,6 @@ public class TreinadorControle {
         CadastroTreinador treinador = treinadorRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("ID de Treinador inválido:" + id));
         
-        // CUIDADO: Não exponha a senha codificada no formulário de edição!
         // Limpamos a senha para que ela não seja exibida, mas o campo de senha
         // deve ser preenchido caso o usuário queira alterá-la.
         treinador.setSenha(null); 
