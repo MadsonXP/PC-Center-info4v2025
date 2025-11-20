@@ -9,9 +9,8 @@
 <body>
 <div class="container mt-5">
     
-    <div class="alert alert-info" role="alert">
+    <div class="alert alert-info" role="alert" th:if="${nomeUsuario}">
         Você está logado como **<span th:text="${nomeUsuario}">Usuário</span>**.
-        Você só pode cadastrar Pokémons em seu nome.
     </div>
     
     <h1 class="mb-4">Pokémons Cadastrados</h1>
@@ -22,7 +21,33 @@
     </div>
     
     <table class="table table-bordered table-striped">
-        </table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Nível</th>
+            <th>Treinador</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pokemon : ${pokemons}">
+            <td th:text="${pokemon.id}">ID</td>
+            <td th:text="${pokemon.nome}">Nome</td>
+            <td th:text="${pokemon.tipo}">Tipo</td>
+            <td th:text="${pokemon.nivel}">Nível</td>
+            <td th:text="${pokemon.treinador?.nome}">Treinador</td> 
+            <td>
+                <a th:href="@{/pokemons/{id}/editar(id=${pokemon.id})}" class="btn btn-sm btn-info text-white">Editar</a>
+                <a th:href="@{/pokemons/{id}/excluir(id=${pokemon.id})}" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(pokemons)}">
+            <td colspan="6" class="text-center">Nenhum Pokémon cadastrado.</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
