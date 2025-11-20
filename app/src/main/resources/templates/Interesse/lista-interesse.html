@@ -8,12 +8,48 @@
 </head>
 <body>
 <div class="container mt-5">
+    
+    <div class="alert alert-info" role="alert" th:if="${nomeUsuario}">
+        Você está logado como **<span th:text="${nomeUsuario}">Usuário</span>**.
+    </div>
+    
     <h1 class="mb-4">Lista de Pokémons Desejados</h1>
     
     <div class="d-flex justify-content-between mb-3">
         <a th:href="@{/interesses/novo}" class="btn btn-success">Cadastrar Novo Interesse</a>
         <a th:href="@{/}" class="btn btn-secondary">Voltar ao Menu Principal</a>
     </div>
+
+    <h2 class="mt-4 mb-3 text-primary">Meus Interesses Cadastrados</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Pokémon Desejado</th>
+            <th>Tipo Desejado</th>
+            <th>Observações</th>
+            <th>Data</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="interesse : ${meusInteresses}">
+            <td th:text="${interesse.pokemonDesejadoNome}">Nome</td>
+            <td th:text="${interesse.pokemonDesejadoTipo}">Tipo</td>
+            <td th:text="${interesse.observacoes}">Observações</td>
+            <td th:text="${#temporals.format(interesse.dataInteresse, 'dd/MM/yyyy')}">Data</td>
+            <td>
+                <a th:href="@{/interesses/{id}/editar(id=${interesse.id})}" class="btn btn-sm btn-info text-white">Editar</a>
+                <a th:href="@{/interesses/{id}/excluir(id=${interesse.id})}" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(meusInteresses)}">
+            <td colspan="5" class="text-center">Você ainda não cadastrou nenhum Pokémon na lista de interesse.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mt-5 mb-3 text-success">Interesses de Outros Treinadores</h2>
     
     <table class="table table-bordered table-striped">
         <thead>
@@ -22,20 +58,26 @@
             <th>Pokémon Desejado</th>
             <th>Tipo Desejado</th>
             <th>Observações</th>
-            <th>Data do Interesse</th>
+            <th>Data</th>
+            <th>Ações</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="interesse : ${interesses}">
-            <td th:text="${interesse.treinador?.nome ?: 'N/A'}">Nome do Treinador</td>
+        <tr th:each="interesse : ${outrosInteresses}">
+            <td th:text="${interesse.treinador?.nome}">Treinador</td>
             <td th:text="${interesse.pokemonDesejadoNome}">Nome</td>
             <td th:text="${interesse.pokemonDesejadoTipo}">Tipo</td>
-            <td th:text="${interesse.observacoes}">Obs</td>
-            <td th:text="${interesse.dataInteresse}">Data</td>
+            <td th:text="${interesse.observacoes}">Observações</td>
+            <td th:text="${#temporals.format(interesse.dataInteresse, 'dd/MM/yyyy')}">Data</td>
+            <td>
+                <a th:href="@{/solicitacoes/novo(interesseId=${interesse.id})}" class="btn btn-sm btn-warning">Propor Troca</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(outrosInteresses)}">
+            <td colspan="6" class="text-center">Nenhuma lista de interesse de outros treinadores disponível.</td>
         </tr>
         </tbody>
     </table>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.time.LocalDate;
-import java.util.Collections; // Import necessário
+import java.util.Collections;
+import java.util.List; 
 
 @Controller
 @RequestMapping("/interesses")
@@ -32,10 +33,21 @@ public class ListaInteresseControle {
             .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado não encontrado no banco de dados."));
     }
 
+    // MÉTODO CORRIGIDO: Separa Interesses em duas listas
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("nomeUsuario", getTreinadorLogado().getNome());
-        model.addAttribute("interesses", listaInteresseRepo.findAll());
+        CadastroTreinador treinadorLogado = getTreinadorLogado();
+        Long treinadorId = treinadorLogado.getId();
+        
+        // 1. Busca os Interesses do próprio Treinador
+        List<ListaInteresse> meusInteresses = listaInteresseRepo.findByTreinadorId(treinadorId);
+        // 2. Busca os Interesses de outros Treinadores
+        List<ListaInteresse> outrosInteresses = listaInteresseRepo.findByTreinadorIdNot(treinadorId);
+        
+        model.addAttribute("nomeUsuario", treinadorLogado.getNome());
+        model.addAttribute("meusInteresses", meusInteresses); // Lista para a primeira tabela
+        model.addAttribute("outrosInteresses", outrosInteresses); // Lista para a segunda tabela
+        
         return "Interesse/lista-interesse"; 
     }
 
@@ -46,7 +58,7 @@ public class ListaInteresseControle {
         model.addAttribute("nomeUsuario", treinadorLogado.getNome());
         model.addAttribute("interesse", new ListaInteresse());
         
-        // CORREÇÃO CRÍTICA: Envia APENAS o treinador logado em uma lista para o binding no HTML
+        // CORREÇÃO CRÍTICA: Envia apenas o treinador logado para o binding (campo oculto)
         model.addAttribute("treinadores", Collections.singletonList(treinadorLogado)); 
         
         return "Interesse/formulario-interesse"; 
@@ -55,17 +67,25 @@ public class ListaInteresseControle {
     @PostMapping
     public String salvar(@Valid @ModelAttribute("interesse") ListaInteresse interesse, BindingResult result) {
         
-        // Se a validação falhar, o Treinador ID é perdido. Precisamos re-anexá-lo ao modelo.
+        // CORREÇÃO DE PERSISTÊNCIA: Em caso de erro de validação, reinjeta o Treinador
         if (result.hasErrors()) {
             CadastroTreinador treinadorLogado = getTreinadorLogado();
             result.getModel().put("nomeUsuario", treinadorLogado.getNome());
-            // Reenvia a lista de treinadores (com um único item)
             result.getModel().put("treinadores", Collections.singletonList(treinadorLogado));
             return "Interesse/formulario-interesse";
         }
         
-        // A associação é feita automaticamente pelo Thymeleaf no campo oculto do HTML
         listaInteresseRepo.save(interesse);
         return "redirect:/interesses";
     }
+    
+    // NOTA: Adicione os métodos editar e excluir aqui se eles existirem ou forem necessários.
+    // Exemplo de Excluir:
+    /*
+    @GetMapping("/{id}/excluir")
+    public String excluir(@PathVariable Long id) {
+        listaInteresseRepo.deleteById(id);
+        return "redirect:/interesses";
+    }
+    */
 }

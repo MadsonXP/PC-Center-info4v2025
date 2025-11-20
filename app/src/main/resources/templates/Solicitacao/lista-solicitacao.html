@@ -8,36 +8,76 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Solicitações de Troca</h1>
     
-    <div class="d-flex justify-content-between mb-3">
-        <a th:href="@{/solicitacoes/novo}" class="btn btn-success">Nova Solicitação de Troca</a>
-        <a th:href="@{/}" class="btn btn-secondary">Voltar ao Menu Principal</a>
+    <div class="alert alert-info" role="alert" th:if="${nomeUsuario}">
+        Você está logado como **<span th:text="${nomeUsuario}">Usuário</span>**.
     </div>
+    
+    <h1 class="mb-4">Gerenciar Solicitações de Troca</h1>
+    
+    <a th:href="@{/}" class="btn btn-secondary mb-3">Voltar ao Menu Principal</a>
+
+    <h2 class="mt-4 mb-3 text-success">Solicitações Recebidas (Aguardando Sua Resposta)</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Proponente</th>
+            <th>Pokémon Oferecido</th>
+            <th>Pokémon Desejado</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="solicitacao : ${recebidas}">
+            <td th:text="${solicitacao.treinadorProponente?.nome}">Proponente</td>
+            <td th:text="${solicitacao.pokemonOferecido?.nome}">Oferecido</td>
+            <td th:text="${solicitacao.pokemonDesejado?.pokemonDesejadoNome}">Desejado</td>
+            <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
+            <td th:text="${solicitacao.statusTroca}" 
+                th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : ''}">Status</td>
+            <td>
+                <div th:if="${solicitacao.statusTroca == 'PENDENTE'}">
+                    <a th:href="@{/solicitacoes/{id}/aceitar(id=${solicitacao.id})}" class="btn btn-sm btn-primary">Aceitar</a>
+                    <a th:href="@{/solicitacoes/{id}/recusar(id=${solicitacao.id})}" class="btn btn-sm btn-danger">Recusar</a>
+                </div>
+                <span th:if="${solicitacao.statusTroca != 'PENDENTE'}" th:text="${solicitacao.statusTroca}"></span>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(recebidas)}">
+            <td colspan="6" class="text-center">Nenhuma solicitação de troca recebida.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mt-5 mb-3 text-primary">Solicitações Enviadas (Seu Acompanhamento)</h2>
     
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th>Solicitante</th>
-            <th>Oferece (Pokémon)</th>
             <th>Receptor</th>
-            <th>Solicita (Pokémon)</th>
-            <th>Status</th>
+            <th>Pokémon Oferecido</th>
+            <th>Pokémon Desejado</th>
             <th>Data</th>
+            <th>Status</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="solicitacao : ${solicitacoes}">
-            <td th:text="${solicitacao.treinadorSolicitante?.nome}">Solicitante</td>
-            <td th:text="${solicitacao.pokemonOferecido?.nome}">Oferecido</td>
+        <tr th:each="solicitacao : ${enviadas}">
             <td th:text="${solicitacao.treinadorReceptor?.nome}">Receptor</td>
-            <td th:text="${solicitacao.pokemonSolicitado?.nome ?: 'Qualquer Pokémon'}">Solicitado</td>
-            <td th:text="${solicitacao.statusTroca}">Status</td>
-            <td th:text="${solicitacao.dataSolicitacao}">Data</td>
+            <td th:text="${solicitacao.pokemonOferecido?.nome}">Oferecido</td>
+            <td th:text="${solicitacao.pokemonDesejado?.pokemonDesejadoNome}">Desejado</td>
+            <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
+            <td th:text="${solicitacao.statusTroca}" 
+                th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : solicitacao.statusTroca == 'ACEITA' ? 'text-success' : 'text-danger'}">Status</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(enviadas)}">
+            <td colspan="5" class="text-center">Você ainda não enviou nenhuma solicitação de troca.</td>
         </tr>
         </tbody>
     </table>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
