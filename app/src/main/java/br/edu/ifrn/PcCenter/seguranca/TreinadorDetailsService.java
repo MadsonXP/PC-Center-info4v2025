@@ -16,17 +16,17 @@ public class TreinadorDetailsService implements UserDetailsService {
     @Autowired
     private TreinadorRepo treinadorRepo;
 
-    // Método obrigatório para carregar o usuário (Treinador) pelo e-mail
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Busca o Treinador pelo e-mail
         CadastroTreinador treinador = treinadorRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Treinador não encontrado com e-mail: " + email));
 
-        // Converte o objeto Treinador para o formato UserDetails
+        // Converte o objeto Treinador para o formato UserDetails que o Spring entende
         return new org.springframework.security.core.userdetails.User(
                 treinador.getEmail(), 
-                treinador.getSenha(), 
-                emptyList() // Lista de Autoridades (papéis), vazia por enquanto
+                treinador.getSenha(), // A senha já está codificada no banco
+                emptyList() 
         );
     }
 }

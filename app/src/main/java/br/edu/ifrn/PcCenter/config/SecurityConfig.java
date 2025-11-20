@@ -17,13 +17,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // Permite acesso público ao index, H2 console, e URLs de cadastro e salvamento de treinador
+                // Libera acesso público ao index, H2, e caminhos de cadastro
                 .requestMatchers(
                     "/", 
                     "/h2-console/**", 
                     "/css/**", "/js/**", "/images/**", 
-                    "/treinadores/novo",      // NOVO: Permite acesso ao formulário de cadastro
-                    "/treinadores").permitAll() // NOVO: Permite o POST de salvamento do novo treinador
+                    "/treinadores/novo",      
+                    "/treinadores",           
+                    "/login"                  
+                    ).permitAll() 
                 
                 // Exige autenticação para todas as outras rotas
                 .anyRequest().authenticated()
