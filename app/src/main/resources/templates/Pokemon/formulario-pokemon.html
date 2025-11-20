@@ -18,6 +18,18 @@
         
         <input type="hidden" th:field="*{id}" />
 
+        <div class="mb-3" th:if="${pokemon.id == null}">
+            <label for="treinador" class="form-label visually-hidden">Treinador</label>
+            <select id="treinador" th:field="*{treinador}" class="form-select" required style="display:none;">
+                <option th:each="t : ${treinadores}" 
+                        th:value="${t.id}" 
+                        th:text="${t.nome}"
+                        selected>
+                    Nome do Treinador
+                </option>
+            </select>
+            <span class="text-danger" th:if="${#fields.hasErrors('treinador')}" th:errors="*{treinador}"></span>
+        </div>
         <div class="mb-3">
             <label for="nome" class="form-label">Nome do Pokémon:</label>
             <input type="text" id="nome" th:field="*{nome}" class="form-control" required maxlength="100"/>
