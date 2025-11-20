@@ -3,13 +3,13 @@ package br.edu.ifrn.PcCenter.web.controladores;
 import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 import br.edu.ifrn.PcCenter.persistencia.repositorio.TreinadorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import java.time.LocalDate; // NOVO: Importa LocalDate
+import java.time.LocalDate; 
 
 @Controller
 @RequestMapping("/treinadores")
@@ -43,7 +43,7 @@ public class TreinadorControle {
             return "Treinador/formulario-treinador";
         }
         
-        // CORREÇÃO CRÍTICA: Define a data de cadastro automaticamente
+        // Define a data de cadastro automaticamente
         if (treinador.getDataCadastro() == null) {
             treinador.setDataCadastro(LocalDate.now());
         }
@@ -54,7 +54,9 @@ public class TreinadorControle {
         treinador.setSenha(senhaCodificada);
         
         treinadorRepo.save(treinador);
-        return "redirect:/treinadores"; 
+        
+        // CORREÇÃO: Redireciona para a página de login
+        return "redirect:/login"; 
     }
 
     @GetMapping("/{id}/editar")

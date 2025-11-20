@@ -32,9 +32,8 @@
     
     <div class="d-flex justify-content-between align-items-center mb-4 p-2 bg-light border rounded">
         <span class="fw-bold">
-            Olá, Treinador(a) <span th:text="${nomeUsuario}">Usuário</span>!
+            Olá, <span th:text="${nomeUsuario}">Usuário</span>!
         </span>
-        
         <a th:href="@{/logout}" class="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Sair
         </a>
@@ -49,14 +48,6 @@
 
     <div class="card-link-container">
         
-        <div class="card text-center module-card">
-            <div class="card-body">
-                <h5 class="card-title">Treinadores</h5>
-                <p class="card-text">Visualizar e cadastrar todos os usuários.</p>
-                <a th:href="@{/treinadores}" class="btn btn-primary">Acessar Lista</a>
-            </div>
-        </div>
-
         <div class="card text-center module-card">
             <div class="card-body">
                 <h5 class="card-title">Pokémons para Troca</h5>

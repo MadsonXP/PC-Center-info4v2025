@@ -1,7 +1,5 @@
 package br.edu.ifrn.PcCenter.config;
 
-// ... imports existentes
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,10 +17,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // 1. ROTAS RESTRITAS AO ADMIN (Apenas Ash pode acessar)
-                .requestMatchers("/treinadores", "/treinadores/**").hasRole("ADMIN")
-                
-                // 2. ROTAS PÚBLICAS (Permitir Cadastro e Login)
+                // 1. ROTAS PÚBLICAS (Regra mais permissiva vem primeiro)
                 .requestMatchers( 
                     "/h2-console/**", 
                     "/css/**", "/js/**", "/images/**", 
@@ -30,7 +25,10 @@ public class SecurityConfig {
                     "/treinadores",           // Permite POST: Enviar/Salvar o formulário
                     "/login"                  // Permite acesso ao formulário de login
                     ).permitAll() 
-
+                
+                // 2. ROTAS RESTRITAS AO ADMIN (Aplica a regra restritiva nas rotas restantes)
+                .requestMatchers("/treinadores", "/treinadores/**").hasRole("ADMIN")
+                
                 // 3. O RESTANTE (Index, Pokemons, Interesses, Solicitacoes) requer APENAS autenticação
                 .anyRequest().authenticated()
             )

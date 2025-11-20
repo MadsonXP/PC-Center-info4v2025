@@ -22,9 +22,9 @@ public class CadastroPokemon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // CORREÇÃO: Usando FetchType.EAGER para evitar LazyInitializationException no Thymeleaf
-    @ManyToOne(fetch = FetchType.EAGER) 
-    @JoinColumn(name = "treinador_id", nullable = false)
+    // Relacionamento CRÍTICO: Garante que o campo 'treinador_id' é obrigatório no DB
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "treinador_id", nullable = false) 
     @NotNull(message = "O treinador é obrigatório.")
     private CadastroTreinador treinador;
 
