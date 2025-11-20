@@ -2,8 +2,10 @@ package br.edu.ifrn.PcCenter.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider; 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService; 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,43 +15,61 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Injeção da sua implementação de UserDetailsService (TreinadorDetailsService)
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // 1. ROTAS PÚBLICAS (Regra mais permissiva vem primeiro)
+                // Rotas Públicas
                 .requestMatchers( 
                     "/h2-console/**", 
                     "/css/**", "/js/**", "/images/**", 
-                    "/treinadores/novo",      // Permite GET: Carregar o formulário
-                    "/treinadores",           // Permite POST: Enviar/Salvar o formulário
-                    "/login"                  // Permite acesso ao formulário de login
+                    "/treinadores/novo",      
+                    "/treinadores",           
+                    "/login"                  
                     ).permitAll() 
                 
-                // 2. ROTAS RESTRITAS AO ADMIN (Aplica a regra restritiva nas rotas restantes)
+                // Rotas Restritas
                 .requestMatchers("/treinadores", "/treinadores/**").hasRole("ADMIN")
                 
-                // 3. O RESTANTE (Index, Pokemons, Interesses, Solicitacoes) requer APENAS autenticação
+                // O RESTANTE requer autenticação
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/", true) // Redireciona para o index após o login
+                .defaultSuccessUrl("/", true)
             )
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .permitAll()
-            );
+            )
+            // CRÍTICO: Configura o provedor de autenticação customizado
+            .authenticationProvider(authenticationProvider()); 
 
-        // Configuração necessária para o H2 Console funcionar com Spring Security
         http.csrf(csrf -> csrf.disable());
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
     }
 
+    // Bean que define o codificador de senhas (BCrypt)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    // CRÍTICO: Bean que configura o provedor de autenticação para usar sua classe TreinadorDetailsService e o BCrypt
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService); // Usa sua implementação
+        authProvider.setPasswordEncoder(passwordEncoder());      // Usa o BCrypt
+        return authProvider;
     }
 }
