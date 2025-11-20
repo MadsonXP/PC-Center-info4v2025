@@ -3,7 +3,6 @@ package br.edu.ifrn.PcCenter.web.controladores;
 import br.edu.ifrn.PcCenter.persistencia.modelo.SolicitacaoTroca; 
 import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 import br.edu.ifrn.PcCenter.persistencia.modelo.ListaInteresse;
-import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroPokemon;
 import br.edu.ifrn.PcCenter.persistencia.modelo.StatusTroca; 
 
 import br.edu.ifrn.PcCenter.persistencia.repositorio.SolicitacaoTrocaRepo;
@@ -19,17 +18,23 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+// IMPORTES PARA LOGGING
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("/solicitacoes")
 public class SolicitacaoTrocaControle {
+    
+    // 1. Adicionar o Logger para depuração
+    private static final Logger logger = LoggerFactory.getLogger(SolicitacaoTrocaControle.class);
 
     @Autowired
-    private SolicitacaoTrocaRepo solicitacaoTrocaRepo;
+    private SolicitacaoTrocaRepo solicitacaoTrocaRepo; // LINHA CORRIGIDA
 
     @Autowired
     private TreinadorRepo treinadorRepo; 
@@ -48,14 +53,22 @@ public class SolicitacaoTrocaControle {
             .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado não encontrado no banco de dados."));
     }
 
-    // MÉTODO CORRIGIDO: Separa solicitações em Enviadas e Recebidas
+    // MÉTODO LISTAR CORRIGIDO COM LOGS DE DEBUG
     @GetMapping
     public String listar(Model model) {
         CadastroTreinador treinadorLogado = getTreinadorLogado();
         Long treinadorId = treinadorLogado.getId();
         
+        // LOG DE DEBUG PARA VERIFICAR O ID DO USUÁRIO LOGADO
+        logger.info("Treinador Logado: {} (ID: {})", treinadorLogado.getNome(), treinadorId);
+        
+        // Estas consultas dependem da correção do Solicita\<\ctrl60>caoTrocaRepo com JOIN FETCH
         List<SolicitacaoTroca> enviadas = solicitacaoTrocaRepo.findByTreinadorSolicitanteId(treinadorId);
         List<SolicitacaoTroca> recebidas = solicitacaoTrocaRepo.findByTreinadorReceptorId(treinadorId);
+        
+        // LOG DE DEBUG PARA VERIFICAR OS RESULTADOS DA CONSULTA
+        logger.info("Solicitações Enviadas encontradas: {}", enviadas.size());
+        logger.info("Solicitações Recebidas encontradas: {}", recebidas.size());
         
         model.addAttribute("nomeUsuario", treinadorLogado.getNome());
         model.addAttribute("enviadas", enviadas); 
@@ -76,7 +89,7 @@ public class SolicitacaoTrocaControle {
         model.addAttribute("proponente", proponente);
         model.addAttribute("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
         
-        // CORREÇÃO CRÍTICA: Adiciona as listas completas para os campos de seleção
+        // Adiciona as listas completas para os campos de seleção
         model.addAttribute("todosTreinadores", treinadorRepo.findAll()); 
         model.addAttribute("todosPokemons", pokemonRepo.findAll());
         
@@ -84,9 +97,6 @@ public class SolicitacaoTrocaControle {
             Optional<ListaInteresse> interesseOpt = listaInteresseRepo.findById(interesseId);
             if (interesseOpt.isPresent()) {
                 ListaInteresse interesse = interesseOpt.get();
-                
-                // NOTA: O formulário só pode enviar IDs de Pokémon, não o objeto ListaInteresse
-                // Deixamos a atribuição no formulário HTML. Aqui apenas vinculamos o receptor.
                 
                 solicitacao.setTreinadorReceptor(interesse.getTreinador());
                 
@@ -104,20 +114,15 @@ public class SolicitacaoTrocaControle {
     public String salvar(@Valid @ModelAttribute("solicitacao") SolicitacaoTroca solicitacao, BindingResult result) {
         CadastroTreinador proponente = getTreinadorLogado();
         
-        // CORRIGIDO: Nome do método setTreinadorSolicitante
         solicitacao.setTreinadorSolicitante(proponente); 
-        
-        // CORRIGIDO: Tipo de data LocalDateTime.now()
         solicitacao.setDataSolicitacao(LocalDateTime.now()); 
-        
-        // CORRIGIDO: Uso do Enum StatusTroca
         solicitacao.setStatusTroca(StatusTroca.PENDENTE); 
 
-        // CRÍTICO: Se a validação falhar, o Proponente e as listas são perdidos, precisamos re-injetá-los
+        // CRÍTICO: Re-injetar listas e objetos em caso de falha na validação
         if (result.hasErrors()) {
             solicitacao.setTreinadorSolicitante(proponente);
             
-            // CORREÇÃO: Re-injeta todas as listas que foram adicionadas no método GET
+            // Re-injeta todas as listas que foram adicionadas no método GET
             result.getModel().put("nomeUsuario", proponente.getNome());
             result.getModel().put("proponente", proponente);
             result.getModel().put("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
@@ -136,6 +141,7 @@ public class SolicitacaoTrocaControle {
         }
         
         solicitacaoTrocaRepo.save(solicitacao);
+        logger.info("Solicitação de Troca salva com sucesso (ID: {})", solicitacao.getId());
         return "redirect:/solicitacoes";
     }
 }

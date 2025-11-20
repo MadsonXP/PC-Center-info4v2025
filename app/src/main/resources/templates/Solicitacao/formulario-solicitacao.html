@@ -62,7 +62,7 @@
     // 1. Armazena a lista completa de Pokémons e seus donos (Sintaxe correta para Thymeleaf inline)
     var todosPokemons = /*[[${todosPokemons}]]*/ [];
     
-    // 2. Injeta o ID do Pokémon Solicitado que pode ter vindo de um erro de validação (CORRIGIDO)
+    // 2. Injeta o ID do Pokémon Solicitado que pode ter vindo de um erro de validação
     var pokemonSolicitadoId = [[${solicitacao.pokemonSolicitado?.id}]] || null; 
 
     // 3. Função para filtrar Pokémons
@@ -104,6 +104,5 @@
     };
     /*]]>*/
 </script>
-
 </body>
 </html>
