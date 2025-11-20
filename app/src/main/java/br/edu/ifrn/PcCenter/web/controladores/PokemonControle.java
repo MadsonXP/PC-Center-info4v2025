@@ -36,7 +36,6 @@ public class PokemonControle {
     }
 
     // POST /pokemons - Salva (cadastro ou edição) o Pokémon
-    // Atende ao RF001 (Cadastro)
     @PostMapping
     public String salvar(@Valid @ModelAttribute("pokemon") CadastroPokemon pokemon, BindingResult result) {
         if (result.hasErrors()) {
@@ -49,8 +48,7 @@ public class PokemonControle {
         return "redirect:/pokemons";
     }
     
-    // GET /pokemons/{id}/editar - Exibe o formulário de edição
-    // Atende ao RF005 (Atualização)
+    // GET /pokemons/{id}/editar - Exibe o formulário de edição (RF005)
     @GetMapping("/{id}/editar")
     public String editar(@PathVariable Long id, Model model) {
         CadastroPokemon pokemon = pokemonRepo.findById(id)
@@ -61,8 +59,7 @@ public class PokemonControle {
         return "Pokemon/formulario-pokemon";
     }
 
-    // GET /pokemons/{id}/excluir - Deleta o Pokémon
-    // Atende ao RF003 (Deletar)
+    // GET /pokemons/{id}/excluir - Deleta o Pokémon (RF003)
     @GetMapping("/{id}/excluir")
     public String excluir(@PathVariable Long id) {
         pokemonRepo.deleteById(id);

@@ -1,14 +1,6 @@
 package br.edu.ifrn.PcCenter.persistencia.modelo;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType; // Este import é crucial
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,13 +22,12 @@ public class CadastroPokemon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // fetch = FetchType.EAGER deve estar aqui
+    // CORREÇÃO: Usando FetchType.EAGER para evitar LazyInitializationException no Thymeleaf
     @ManyToOne(fetch = FetchType.EAGER) 
     @JoinColumn(name = "treinador_id", nullable = false)
     @NotNull(message = "O treinador é obrigatório.")
-    private CadastroTreinador treinador; // Verifique se CadastroTreinador está importado corretamente
+    private CadastroTreinador treinador;
 
-    // ... (restante do código)
     @Column(name = "nome", nullable = false, length = 100)
     @NotBlank(message = "O nome do Pokémon é obrigatório.")
     @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres.")
