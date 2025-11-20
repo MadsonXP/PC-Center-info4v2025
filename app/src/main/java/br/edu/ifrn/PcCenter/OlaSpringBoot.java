@@ -1,14 +1,14 @@
 package br.edu.ifrn.PcCenter;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@RestController
-
+@Controller
 public class OlaSpringBoot {
-@GetMapping("/")
-public String index(){
-    return "olá spring boot";
-}
-
+    
+    @GetMapping("/")
+    public String index(){
+        // CORREÇÃO FINAL: Retorna o template no caminho index/index.html
+        return "index/index"; 
+    }
 }
