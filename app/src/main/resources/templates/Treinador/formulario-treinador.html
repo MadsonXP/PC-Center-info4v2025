@@ -26,7 +26,12 @@
             <input type="email" id="email" th:field="*{email}" class="form-control" required maxlength="100"/>
             <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
         </div>
-
+        
+        <div class="mb-3">
+            <label for="senha" class="form-label">Senha:</label>
+            <input type="password" id="senha" th:field="*{senha}" class="form-control" required maxlength="100"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+        </div>
         <button type="submit" class="btn btn-primary">Salvar</button>
         <a th:href="@{/treinadores}" class="btn btn-secondary">Voltar à Lista</a> 
     </form>

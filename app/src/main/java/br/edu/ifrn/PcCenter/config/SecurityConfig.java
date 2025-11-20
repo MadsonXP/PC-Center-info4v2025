@@ -17,23 +17,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // Permite acesso público ao index, H2 console, CSS/JS (recursos estáticos)
+                // Permite acesso público ao index, H2 console, e URLs de cadastro e salvamento de treinador
                 .requestMatchers(
                     "/", 
                     "/h2-console/**", 
-                    "/css/**", "/js/**", "/images/**").permitAll()
+                    "/css/**", "/js/**", "/images/**", 
+                    "/treinadores/novo",      // NOVO: Permite acesso ao formulário de cadastro
+                    "/treinadores").permitAll() // NOVO: Permite o POST de salvamento do novo treinador
                 
-                // Exige autenticação para todas as outras rotas (listagens e cadastros)
+                // Exige autenticação para todas as outras rotas
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                // Define a URL da página de login customizada
                 .loginPage("/login").permitAll()
-                // URL para onde o usuário é redirecionado após o login bem-sucedido
                 .defaultSuccessUrl("/pokemons", true)
             )
             .logout(logout -> logout
-                // Define a URL de logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .permitAll()
             );
