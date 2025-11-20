@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat; // IMPORT CORRIGIDO
+import org.springframework.format.annotation.DateTimeFormat; // <<--- ESTE IMPORT É CRÍTICO
 
 @Entity
 @Table(name = "lista_interesses")
@@ -23,7 +23,7 @@ public class ListaInteresse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relacionamento ManyToOne com Treinador (EAGER)
+    // A validação @NotNull aqui exige que o campo seja preenchido no Controller
     @ManyToOne(fetch = FetchType.EAGER) 
     @JoinColumn(name = "treinador_id", nullable = false)
     @NotNull(message = "O treinador é obrigatório.")
@@ -43,7 +43,6 @@ public class ListaInteresse {
 
     @Column(name = "data_interesse", nullable = false)
     @NotNull(message = "A data de interesse é obrigatória.")
-    // CORREÇÃO CRÍTICA: Permite que o Spring converta a string do HTML para LocalDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd") 
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // <<--- CORREÇÃO DE FORMATAÇÃO
     private LocalDate dataInteresse; 
 }
