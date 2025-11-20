@@ -6,6 +6,7 @@ import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 
 public interface TreinadorRepo extends JpaRepository<CadastroTreinador, Long> {
 
-    // MÉTODO CRÍTICO: Usado para buscar o Treinador pelo e-mail (Username)
+    // Método padrão: Usado para busca exata (Login e Cadastro)
     Optional<CadastroTreinador> findByEmail(String email);
+    // Remover qualquer outro método findByEmail...
 }

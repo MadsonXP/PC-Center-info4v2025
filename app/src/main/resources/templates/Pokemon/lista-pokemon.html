@@ -8,6 +8,12 @@
 </head>
 <body>
 <div class="container mt-5">
+    
+    <div class="alert alert-info" role="alert">
+        Você está logado como **<span th:text="${nomeUsuario}">Usuário</span>**.
+        Você só pode cadastrar Pokémons em seu nome.
+    </div>
+    
     <h1 class="mb-4">Pokémons Cadastrados</h1>
     
     <div class="d-flex justify-content-between mb-3">
@@ -16,30 +22,7 @@
     </div>
     
     <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Tipo</th>
-            <th>Nível</th>
-            <th>Habilidade</th>
-            <th>Treinador</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="pokemon : ${pokemons}">
-            <td th:text="${pokemon.nome}">Nome</td>
-            <td th:text="${pokemon.tipo}">Tipo</td>
-            <td th:text="${pokemon.nivel}">Nível</td>
-            <td th:text="${pokemon.habilidade}">Habilidade</td>
-            <td th:text="${pokemon.treinador?.nome}">Treinador</td>
-            <td>
-                <a th:href="@{/pokemons/{id}/editar(id=${pokemon.id})}" class="btn btn-sm btn-info text-white">Editar</a>
-                <a th:href="@{/pokemons/{id}/excluir(id=${pokemon.id})}" class="btn btn-sm btn-danger">Excluir</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        </table>
 </div>
 </body>
 </html>

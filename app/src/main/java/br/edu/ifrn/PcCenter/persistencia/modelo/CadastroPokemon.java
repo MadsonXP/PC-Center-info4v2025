@@ -22,7 +22,7 @@ public class CadastroPokemon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relacionamento CRÍTICO: Garante que o campo 'treinador_id' é obrigatório no DB
+    // Relacionamento CRÍTICO: Garante que o campo 'treinador_id' é obrigatório
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "treinador_id", nullable = false) 
     @NotNull(message = "O treinador é obrigatório.")

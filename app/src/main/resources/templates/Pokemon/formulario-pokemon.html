@@ -10,6 +10,10 @@
 <div class="container mt-5">
     <h1 class="mb-4" th:text="${pokemon.id == null ? 'Cadastrar Novo Pokémon' : 'Editar Pokémon'}"></h1>
 
+    <div class="alert alert-success" role="alert" th:if="${nomeUsuario}">
+        Você está cadastrando este Pokémon em nome de **<span th:text="${nomeUsuario}">Usuário</span>**.
+    </div>
+
     <form th:action="@{/pokemons}" th:object="${pokemon}" method="post">
         
         <input type="hidden" th:field="*{id}" />
@@ -27,15 +31,15 @@
         </div>
 
         <div class="mb-3">
-            <label for="habilidade" class="form-label">Habilidade:</label>
-            <input type="text" id="habilidade" th:field="*{habilidade}" class="form-control" maxlength="100"/>
-            <span class="text-danger" th:if="${#fields.hasErrors('habilidade')}" th:errors="*{habilidade}"></span>
-        </div>
-
-        <div class="mb-3">
             <label for="nivel" class="form-label">Nível:</label>
             <input type="number" id="nivel" th:field="*{nivel}" class="form-control" required min="1"/>
             <span class="text-danger" th:if="${#fields.hasErrors('nivel')}" th:errors="*{nivel}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="habilidade" class="form-label">Habilidade:</label>
+            <input type="text" id="habilidade" th:field="*{habilidade}" class="form-control" maxlength="100"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('habilidade')}" th:errors="*{habilidade}"></span>
         </div>
 
         <button type="submit" class="btn btn-primary">Salvar</button>

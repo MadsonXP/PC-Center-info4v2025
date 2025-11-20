@@ -21,22 +21,21 @@ public class TreinadorDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Usa o método findByEmail (consistente com o Repositório)
         CadastroTreinador treinador = treinadorRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Treinador não encontrado com e-mail: " + email));
 
-        // Lógica para atribuir o papel (ROLE)
         List<GrantedAuthority> authorities;
-        // Se o e-mail for de Ash, atribui ROLE_ADMIN
+        // Lógica de atribuição de papel
         if (treinador.getEmail().equals("ash.ketchum@example.com")) {
              authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
-             // Caso contrário, atribui ROLE_USER
              authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
         }
 
         return new org.springframework.security.core.userdetails.User(
                 treinador.getEmail(), 
-                treinador.getSenha(), // Pega a senha CODIFICADA do objeto
+                treinador.getSenha(), 
                 authorities 
         );
     }
