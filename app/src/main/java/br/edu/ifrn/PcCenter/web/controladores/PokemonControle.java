@@ -5,7 +5,7 @@ import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 import br.edu.ifrn.PcCenter.persistencia.repositorio.PokemonRepo;
 import br.edu.ifrn.PcCenter.persistencia.repositorio.TreinadorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder; // Import ESSENCIAL
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,8 +25,10 @@ public class PokemonControle {
     // Método auxiliar para buscar o Treinador logado
     private CadastroTreinador getTreinadorLogado() {
         String emailLogado = SecurityContextHolder.getContext().getAuthentication().getName();
-        return treinadorRepo.findByEmail(emailLogado)
-            .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado não encontrado no banco de dados."));
+        // A busca no Repositório DEVE funcionar se o usuário está logado
+        return treinadorRepo.findByEmail(emailLogado) 
+            .orElseThrow(() -> 
+                new IllegalStateException("Erro fatal: Treinador logado (" + emailLogado + ") não foi encontrado no DB."));
     }
 
     @GetMapping
@@ -50,13 +52,14 @@ public class PokemonControle {
         CadastroTreinador treinadorLogado = getTreinadorLogado();
         pokemon.setTreinador(treinadorLogado);
 
-        // 2. Agora o erro do Treinador (se houver) é ignorado, e checamos os campos obrigatórios restantes
+        // 2. Checa as validações (nome, tipo, nível, etc.)
         if (result.hasErrors()) {
             // Se houver erro, recarregamos o nome do usuário para não perdê-lo
             result.getModel().put("nomeUsuario", treinadorLogado.getNome());
             return "Pokemon/formulario-pokemon";
         }
         
+        // 3. Salva no Banco de Dados
         pokemonRepo.save(pokemon);
         return "redirect:/pokemons";
     }
