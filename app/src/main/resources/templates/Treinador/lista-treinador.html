@@ -9,7 +9,11 @@
 <body>
 <div class="container mt-5">
     <h1 class="mb-4">Treinadores Cadastrados</h1>
-    <a href="/treinadores/novo" class="btn btn-success mb-3">Cadastrar Novo Treinador</a>
+    
+    <a th:href="@{/treinadores/novo}" class="btn btn-success mb-3">Cadastrar Novo Treinador</a>
+    
+    <a th:href="@{/}" class="btn btn-secondary mb-3">Voltar ao Menu Principal</a>
+    
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
