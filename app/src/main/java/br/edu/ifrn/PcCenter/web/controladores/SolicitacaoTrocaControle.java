@@ -19,7 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime; // Data/Hora (CORRIGIDO: Usamos LocalDateTime)
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -76,6 +76,10 @@ public class SolicitacaoTrocaControle {
         model.addAttribute("proponente", proponente);
         model.addAttribute("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
         
+        // CORREÇÃO CRÍTICA: Adiciona as listas completas para os campos de seleção
+        model.addAttribute("todosTreinadores", treinadorRepo.findAll()); 
+        model.addAttribute("todosPokemons", pokemonRepo.findAll());
+        
         if (interesseId != null) {
             Optional<ListaInteresse> interesseOpt = listaInteresseRepo.findById(interesseId);
             if (interesseOpt.isPresent()) {
@@ -112,9 +116,13 @@ public class SolicitacaoTrocaControle {
         // CRÍTICO: Se a validação falhar, o Proponente e as listas são perdidos, precisamos re-injetá-los
         if (result.hasErrors()) {
             solicitacao.setTreinadorSolicitante(proponente);
+            
+            // CORREÇÃO: Re-injeta todas as listas que foram adicionadas no método GET
             result.getModel().put("nomeUsuario", proponente.getNome());
             result.getModel().put("proponente", proponente);
             result.getModel().put("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
+            result.getModel().put("todosTreinadores", treinadorRepo.findAll());
+            result.getModel().put("todosPokemons", pokemonRepo.findAll());
             
             // Recarrega as listas de apoio para evitar falhas no HTML
             if (solicitacao.getPokemonSolicitado() != null) {

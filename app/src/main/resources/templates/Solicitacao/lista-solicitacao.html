@@ -32,9 +32,11 @@
         </thead>
         <tbody>
         <tr th:each="solicitacao : ${recebidas}">
-            <td th:text="${solicitacao.treinadorProponente?.nome}">Proponente</td>
+            <td th:text="${solicitacao.treinadorSolicitante?.nome}">Proponente</td>
             <td th:text="${solicitacao.pokemonOferecido?.nome}">Oferecido</td>
-            <td th:text="${solicitacao.pokemonDesejado?.pokemonDesejadoNome}">Desejado</td>
+            
+            <td th:text="${solicitacao.pokemonSolicitado?.nome != null ? solicitacao.pokemonSolicitado?.nome : 'Troca Aberta'}">Desejado</td>
+            
             <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
             <td th:text="${solicitacao.statusTroca}" 
                 th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : ''}">Status</td>
@@ -68,7 +70,9 @@
         <tr th:each="solicitacao : ${enviadas}">
             <td th:text="${solicitacao.treinadorReceptor?.nome}">Receptor</td>
             <td th:text="${solicitacao.pokemonOferecido?.nome}">Oferecido</td>
-            <td th:text="${solicitacao.pokemonDesejado?.pokemonDesejadoNome}">Desejado</td>
+            
+            <td th:text="${solicitacao.pokemonSolicitado?.nome != null ? solicitacao.pokemonSolicitado?.nome : 'Troca Aberta'}">Desejado</td>
+            
             <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
             <td th:text="${solicitacao.statusTroca}" 
                 th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : solicitacao.statusTroca == 'ACEITA' ? 'text-success' : 'text-danger'}">Status</td>

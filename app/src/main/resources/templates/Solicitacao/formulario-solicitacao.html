@@ -20,9 +20,9 @@
             <label for="pokemonOferecido" class="form-label">Pokémon OFERECIDO (Seu):</label>
             <select id="pokemonOferecido" th:field="*{pokemonOferecido}" class="form-select" required>
                 <option value="">Selecione um Pokémon para Oferecer</option>
-                <option th:each="p : ${pokemons}" 
+                <option th:each="p : ${meusPokemons}" 
                         th:value="${p.id}" 
-                        th:text="${p.nome + ' (Pertence a: ' + p.treinador.nome + ')'}">
+                        th:text="${p.nome + ' (Nível: ' + p.nivel + ')'}">
                     Nome do Pokémon
                 </option>
             </select>
@@ -31,11 +31,12 @@
 
         <div class="mb-3">
             <label for="treinadorReceptor" class="form-label">Treinador RECEPTOR:</label>
-            <select id="treinadorReceptor" th:field="*{treinadorReceptor}" class="form-select" required>
+            <select id="treinadorReceptor" th:field="*{treinadorReceptor}" class="form-select" required onchange="filtrarPokemonsDoReceptor()">
                 <option value="">Selecione o Treinador Receptor</option>
-                <option th:each="t : ${treinadores}" 
+                <option th:each="t : ${todosTreinadores}" 
                         th:value="${t.id}" 
-                        th:text="${t.nome}">
+                        th:text="${t.nome}"
+                        th:selected="${solicitacao.treinadorReceptor != null and t.id == solicitacao.treinadorReceptor.id}">
                     Nome do Treinador
                 </option>
             </select>
@@ -46,11 +47,6 @@
             <label for="pokemonSolicitado" class="form-label">Pokémon SOLICITADO (Opcional):</label>
             <select id="pokemonSolicitado" th:field="*{pokemonSolicitado}" class="form-select">
                 <option value="">Nenhum Pokémon Específico (Troca Aberta)</option>
-                <option th:each="p : ${pokemons}" 
-                        th:value="${p.id}" 
-                        th:text="${p.nome + ' (Pertence a: ' + p.treinador.nome + ')'}">
-                    Nome do Pokémon
-                </option>
             </select>
             <span class="text-danger" th:if="${#fields.hasErrors('pokemonSolicitado')}" th:errors="*{pokemonSolicitado}"></span>
         </div>
@@ -59,5 +55,55 @@
         <a th:href="@{/solicitacoes}" class="btn btn-secondary">Voltar à Lista</a>
     </form>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    
+    // 1. Armazena a lista completa de Pokémons e seus donos (Sintaxe correta para Thymeleaf inline)
+    var todosPokemons = /*[[${todosPokemons}]]*/ [];
+    
+    // 2. Injeta o ID do Pokémon Solicitado que pode ter vindo de um erro de validação (CORRIGIDO)
+    var pokemonSolicitadoId = [[${solicitacao.pokemonSolicitado?.id}]] || null; 
+
+    // 3. Função para filtrar Pokémons
+    function filtrarPokemonsDoReceptor() {
+        var receptorSelect = document.getElementById('treinadorReceptor');
+        var pokemonSolicitadoSelect = document.getElementById('pokemonSolicitado');
+        
+        // Limpa as opções atuais, mantendo a opção "Troca Aberta"
+        pokemonSolicitadoSelect.innerHTML = '<option value="">Nenhum Pokémon Específico (Troca Aberta)</option>';
+
+        var receptorId = receptorSelect.value;
+        
+        if (receptorId) {
+            // Filtra a lista para incluir apenas Pokémons do treinador selecionado
+            var pokemonsDoReceptor = todosPokemons.filter(function(p) {
+                // Adiciona verificação para garantir que p.treinador existe
+                return p.treinador && p.treinador.id == receptorId; 
+            });
+            
+            // Adiciona as novas opções filtradas
+            pokemonsDoReceptor.forEach(function(pokemon) {
+                var option = document.createElement('option');
+                option.value = pokemon.id;
+                option.text = pokemon.nome + ' (Nível: ' + pokemon.nivel + ')';
+                
+                // Usa a variável JavaScript injetada (pokemonSolicitadoId)
+                if (pokemonSolicitadoId && pokemon.id == pokemonSolicitadoId) {
+                    option.selected = true;
+                }
+                
+                pokemonSolicitadoSelect.appendChild(option);
+            });
+        }
+    }
+
+    // 4. Garante que a função rode na inicialização (útil se o campo receptor já veio preenchido)
+    window.onload = function() {
+        filtrarPokemonsDoReceptor();
+    };
+    /*]]>*/
+</script>
+
 </body>
 </html>
