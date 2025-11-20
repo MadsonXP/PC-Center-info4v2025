@@ -3,12 +3,13 @@ package br.edu.ifrn.PcCenter.web.controladores;
 import br.edu.ifrn.PcCenter.persistencia.modelo.CadastroTreinador;
 import br.edu.ifrn.PcCenter.persistencia.repositorio.TreinadorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // Import necessário
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.time.LocalDate; // NOVO: Importa LocalDate
 
 @Controller
 @RequestMapping("/treinadores")
@@ -17,7 +18,6 @@ public class TreinadorControle {
     @Autowired
     private TreinadorRepo treinadorRepo;
     
-    // INJEÇÃO CRÍTICA: O Spring Security fornece esta instância
     @Autowired
     private PasswordEncoder passwordEncoder; 
 
@@ -42,8 +42,13 @@ public class TreinadorControle {
         if (result.hasErrors()) {
             return "Treinador/formulario-treinador";
         }
+        
+        // CORREÇÃO CRÍTICA: Define a data de cadastro automaticamente
+        if (treinador.getDataCadastro() == null) {
+            treinador.setDataCadastro(LocalDate.now());
+        }
 
-        // CORREÇÃO DEFINITIVA: Codifica a senha antes de salvar
+        // Codifica a senha antes de salvar
         String senhaPura = treinador.getSenha();
         String senhaCodificada = passwordEncoder.encode(senhaPura);
         treinador.setSenha(senhaCodificada);
@@ -57,7 +62,6 @@ public class TreinadorControle {
         CadastroTreinador treinador = treinadorRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("ID de Treinador inválido:" + id));
         
-        // Remove a senha codificada do modelo para não expor ou quebrar o formulário
         treinador.setSenha(null); 
         
         model.addAttribute("treinador", treinador);

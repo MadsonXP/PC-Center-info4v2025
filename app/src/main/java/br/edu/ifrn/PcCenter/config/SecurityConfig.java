@@ -1,5 +1,7 @@
 package br.edu.ifrn.PcCenter.config;
 
+// ... imports existentes
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,22 +19,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // Libera acesso público ao index, H2, e caminhos de cadastro
-                .requestMatchers(
-                    "/", 
+                // 1. ROTAS RESTRITAS AO ADMIN (Apenas Ash pode acessar)
+                .requestMatchers("/treinadores", "/treinadores/**").hasRole("ADMIN")
+                
+                // 2. ROTAS PÚBLICAS (Permitir Cadastro e Login)
+                .requestMatchers( 
                     "/h2-console/**", 
                     "/css/**", "/js/**", "/images/**", 
-                    "/treinadores/novo",      
-                    "/treinadores",           
-                    "/login"                  
+                    "/treinadores/novo",      // Permite GET: Carregar o formulário
+                    "/treinadores",           // Permite POST: Enviar/Salvar o formulário
+                    "/login"                  // Permite acesso ao formulário de login
                     ).permitAll() 
-                
-                // Exige autenticação para todas as outras rotas
+
+                // 3. O RESTANTE (Index, Pokemons, Interesses, Solicitacoes) requer APENAS autenticação
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/pokemons", true)
+                .defaultSuccessUrl("/", true) // Redireciona para o index após o login
             )
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
@@ -46,7 +50,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Bean que define o codificador de senhas a ser usado (BCrypt)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

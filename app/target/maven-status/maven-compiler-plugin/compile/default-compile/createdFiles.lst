@@ -1,3 +1,4 @@
+br\edu\ifrn\PcCenter\config\SecurityAdvice.class
 br\edu\ifrn\PcCenter\web\controladores\LoginControle.class
 br\edu\ifrn\PcCenter\web\controladores\SolicitacaoTrocaControle.class
 br\edu\ifrn\PcCenter\persistencia\modelo\CadastroPokemon.class
