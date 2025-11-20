@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.time.LocalDate; 
+import java.util.Optional; 
 
 @Controller
 @RequestMapping("/treinadores")
@@ -35,7 +36,10 @@ public class TreinadorControle {
 
     @PostMapping
     public String salvar(@Valid @ModelAttribute("treinador") CadastroTreinador treinador, BindingResult result) {
-        if (treinadorRepo.findByEmail(treinador.getEmail()).isPresent()) {
+        // Verifica se o e-mail existe, mas permite se for o mesmo usuário (edição)
+        Optional<CadastroTreinador> existente = treinadorRepo.findByEmail(treinador.getEmail());
+        
+        if (existente.isPresent() && (treinador.getId() == null || !existente.get().getId().equals(treinador.getId()))) {
             result.rejectValue("email", "erro.duplicado", "Já existe um treinador com este e-mail");
         }
 
@@ -43,7 +47,7 @@ public class TreinadorControle {
             return "Treinador/formulario-treinador";
         }
         
-        // Define a data de cadastro automaticamente
+        // Define a data de cadastro automaticamente se for novo
         if (treinador.getDataCadastro() == null) {
             treinador.setDataCadastro(LocalDate.now());
         }
@@ -55,7 +59,6 @@ public class TreinadorControle {
         
         treinadorRepo.save(treinador);
         
-        // CORREÇÃO: Redireciona para a página de login
         return "redirect:/login"; 
     }
 
@@ -63,8 +66,6 @@ public class TreinadorControle {
     public String editar(@PathVariable Long id, Model model) {
         CadastroTreinador treinador = treinadorRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("ID de Treinador inválido:" + id));
-        
-        treinador.setSenha(null); 
         
         model.addAttribute("treinador", treinador);
         return "Treinador/formulario-treinador";

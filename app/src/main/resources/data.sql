@@ -38,6 +38,14 @@ INSERT INTO lista_interesses (id, treinador_id, pokemon_desejado_nome, pokemon_d
 -- ####################################################################
 
 INSERT INTO solicitacoes_troca (id, treinador_solicitante_id, pokemon_oferecido_id, treinador_receptor_id, pokemon_solicitado_id, status_troca, data_solicitacao) VALUES
-(1, 1, 2, 2, 'PENDENTE', CURRENT_TIMESTAMP()),
-(2, 2, 4, 5, 'PENDENTE', CURRENT_TIMESTAMP()),
-(3, 3, 6, 1, 'RECUSADA', CURRENT_TIMESTAMP());
+(1, 1, 2, 2, NULL, 'PENDENTE', CURRENT_TIMESTAMP()),
+(2, 2, 4, 3, NULL, 'PENDENTE', CURRENT_TIMESTAMP()),
+(3, 3, 6, 1, NULL, 'RECUSADA', CURRENT_TIMESTAMP());
+
+-- ####################################################################
+-- 5. AJUSTE DE SEQUÊNCIAS (CORREÇÃO CRÍTICA PARA O CADASTRO)
+-- ####################################################################
+ALTER TABLE treinadores ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE pokemons ALTER COLUMN id RESTART WITH 7;
+ALTER TABLE lista_interesses ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE solicitacoes_troca ALTER COLUMN id RESTART WITH 4;

@@ -1,11 +1,9 @@
 package br.edu.ifrn.PcCenter.persistencia.modelo;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +23,18 @@ public class CadastroTreinador {
     private Long id;
 
     @Column(name = "nome", nullable = false, length = 100)
+    @NotBlank(message = "O nome é obrigatório.")
+    @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres.")
     private String nome;
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
+    @NotBlank(message = "O e-mail é obrigatório.")
+    @Email(message = "Insira um e-mail válido.")
     private String email;
 
     @Column(name = "senha", nullable = false, length = 255)
+    @NotBlank(message = "A senha é obrigatória.")
+    @Size(min = 3, message = "A senha deve ter pelo menos 3 caracteres.")
     private String senha;
 
     @Column(name = "data_cadastro", nullable = false)
