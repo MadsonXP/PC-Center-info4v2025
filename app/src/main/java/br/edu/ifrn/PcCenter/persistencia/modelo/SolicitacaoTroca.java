@@ -23,7 +23,6 @@ public class SolicitacaoTroca {
     // Treinador Solicitante
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "treinador_solicitante_id", nullable = false)
-    @NotNull(message = "O treinador solicitante é obrigatório.")
     private CadastroTreinador treinadorSolicitante;
 
     // Pokémon Oferecido
