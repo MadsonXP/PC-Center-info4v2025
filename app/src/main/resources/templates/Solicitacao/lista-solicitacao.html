@@ -38,14 +38,16 @@
             <td th:text="${solicitacao.pokemonSolicitado?.nome != null ? solicitacao.pokemonSolicitado?.nome : 'Troca Aberta'}">Desejado</td>
             
             <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
+            
             <td th:text="${solicitacao.statusTroca}" 
-                th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : ''}">Status</td>
+                th:classappend="${solicitacao.statusTroca.name() == 'PENDENTE' ? 'text-warning' : ''}">Status</td>
+            
             <td>
-                <div th:if="${solicitacao.statusTroca == 'PENDENTE'}">
+                <div th:if="${solicitacao.statusTroca.name() == 'PENDENTE'}">
                     <a th:href="@{/solicitacoes/{id}/aceitar(id=${solicitacao.id})}" class="btn btn-sm btn-primary">Aceitar</a>
                     <a th:href="@{/solicitacoes/{id}/recusar(id=${solicitacao.id})}" class="btn btn-sm btn-danger">Recusar</a>
                 </div>
-                <span th:if="${solicitacao.statusTroca != 'PENDENTE'}" th:text="${solicitacao.statusTroca}"></span>
+                <span th:if="${solicitacao.statusTroca.name() != 'PENDENTE'}" th:text="${solicitacao.statusTroca}"></span>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(recebidas)}">
@@ -75,7 +77,7 @@
             
             <td th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy')}">Data</td>
             <td th:text="${solicitacao.statusTroca}" 
-                th:classappend="${solicitacao.statusTroca == 'PENDENTE' ? 'text-warning' : solicitacao.statusTroca == 'ACEITA' ? 'text-success' : 'text-danger'}">Status</td>
+                th:classappend="${solicitacao.statusTroca.name() == 'PENDENTE' ? 'text-warning' : solicitacao.statusTroca.name() == 'ACEITA' ? 'text-success' : 'text-danger'}">Status</td>
         </tr>
         <tr th:if="${#lists.isEmpty(enviadas)}">
             <td colspan="5" class="text-center">Você ainda não enviou nenhuma solicitação de troca.</td>

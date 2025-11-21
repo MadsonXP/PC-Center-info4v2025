@@ -44,18 +44,20 @@ public class SolicitacaoTroca {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_troca", nullable = false)
-    @NotNull(message = "O status da troca é obrigatório.")
+    // REMOVIDO @NotNull daqui para evitar erro de validação no formulário
     private StatusTroca statusTroca;
 
     @Column(name = "data_solicitacao", nullable = false)
-    @NotNull(message = "A data da solicitação é obrigatória.")
-    private LocalDateTime dataSolicitacao = LocalDateTime.now();
+    // REMOVIDO @NotNull daqui para evitar erro de validação no formulário
+    private LocalDateTime dataSolicitacao;
 
-    // Garante que o status seja PENDENTE antes de salvar
     @PrePersist
     public void prePersist() {
         if (statusTroca == null) {
             statusTroca = StatusTroca.PENDENTE;
+        }
+        if (dataSolicitacao == null) {
+            dataSolicitacao = LocalDateTime.now();
         }
     }
 }

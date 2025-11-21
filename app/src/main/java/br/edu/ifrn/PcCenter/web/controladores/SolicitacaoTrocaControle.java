@@ -19,21 +19,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-// IMPORTES PARA LOGGING
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// IMPORTES PARA BINDING
 import org.springframework.web.bind.WebDataBinder;
 import java.beans.PropertyEditorSupport;
-
-// IMPORTANTE: Adicionar @Transactional para garantir o commit
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 @Controller
 @RequestMapping("/solicitacoes")
@@ -53,56 +47,28 @@ public class SolicitacaoTrocaControle {
     @Autowired
     private ListaInteresseRepo listaInteresseRepo;
 
-
-    // MÉTODO CRÍTICO: Configura o binder para converter IDs em Objetos (Treinador e Pokémon)
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        // 1. Binder para CadastroTreinador (para treinadorReceptor)
         binder.registerCustomEditor(CadastroTreinador.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) {
-                if (text != null && !text.isEmpty()) {
-                    try {
-                        Long id = Long.valueOf(text);
-                        // Usa o findById do seu TreinadorRepo
-                        CadastroTreinador treinador = treinadorRepo.findById(id).orElse(null);
-                        setValue(treinador);
-                    } catch (NumberFormatException e) {
-                        logger.error("Erro de formato ao converter ID de Treinador: {}", text);
-                        setValue(null);
-                    }
-                } else {
-                    setValue(null);
-                }
+                try { setValue(treinadorRepo.findById(Long.parseLong(text)).orElse(null)); }
+                catch (Exception e) { setValue(null); }
             }
         });
-
-        // 2. Binder para CadastroPokemon (para pokemonOferecido e pokemonSolicitado)
         binder.registerCustomEditor(CadastroPokemon.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) {
-                if (text != null && !text.isEmpty()) {
-                    try {
-                        Long id = Long.valueOf(text);
-                        // Usa o findById do seu PokemonRepo
-                        CadastroPokemon pokemon = pokemonRepo.findById(id).orElse(null);
-                        setValue(pokemon);
-                    } catch (NumberFormatException e) {
-                        logger.error("Erro de formato ao converter ID de Pokémon: {}", text);
-                        setValue(null); 
-                    }
-                } else {
-                    setValue(null);
-                }
+                try { setValue(pokemonRepo.findById(Long.parseLong(text)).orElse(null)); }
+                catch (Exception e) { setValue(null); }
             }
         });
     }
     
-    
     private CadastroTreinador getTreinadorLogado() {
         String emailLogado = SecurityContextHolder.getContext().getAuthentication().getName();
         return treinadorRepo.findByEmail(emailLogado)
-            .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado não encontrado no banco de dados."));
+            .orElseThrow(() -> new IllegalStateException("Erro: Treinador logado não encontrado."));
     }
 
     @GetMapping
@@ -110,13 +76,8 @@ public class SolicitacaoTrocaControle {
         CadastroTreinador treinadorLogado = getTreinadorLogado();
         Long treinadorId = treinadorLogado.getId();
         
-        logger.info("Treinador Logado: {} (ID: {})", treinadorLogado.getNome(), treinadorId);
-        
         List<SolicitacaoTroca> enviadas = solicitacaoTrocaRepo.findByTreinadorSolicitanteId(treinadorId);
         List<SolicitacaoTroca> recebidas = solicitacaoTrocaRepo.findByTreinadorReceptorId(treinadorId);
-        
-        logger.info("Solicitações Enviadas encontradas: {}", enviadas.size());
-        logger.info("Solicitações Recebidas encontradas: {}", recebidas.size());
         
         model.addAttribute("nomeUsuario", treinadorLogado.getNome());
         model.addAttribute("enviadas", enviadas); 
@@ -130,66 +91,89 @@ public class SolicitacaoTrocaControle {
         CadastroTreinador proponente = getTreinadorLogado();
         SolicitacaoTroca solicitacao = new SolicitacaoTroca();
         
-        model.addAttribute("nomeUsuario", proponente.getNome());
-        model.addAttribute("solicitacao", solicitacao);
-        
-        model.addAttribute("proponente", proponente);
-        model.addAttribute("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
-        
-        model.addAttribute("todosTreinadores", treinadorRepo.findAll()); 
-        model.addAttribute("todosPokemons", pokemonRepo.findAll());
+        prepararModelParaFormulario(model, proponente);
         
         if (interesseId != null) {
             Optional<ListaInteresse> interesseOpt = listaInteresseRepo.findById(interesseId);
             if (interesseOpt.isPresent()) {
                 ListaInteresse interesse = interesseOpt.get();
-                
                 solicitacao.setTreinadorReceptor(interesse.getTreinador());
-                
                 model.addAttribute("interesseSelecionado", interesse);
                 model.addAttribute("receptorSelecionado", interesse.getTreinador());
             }
-        } else {
-             model.addAttribute("todosInteresses", listaInteresseRepo.findAll());
         }
-        
+        model.addAttribute("solicitacao", solicitacao);
         return "Solicitacao/formulario-solicitacao";
     }
 
     @PostMapping
     @Transactional 
-    public String salvar(@Valid @ModelAttribute("solicitacao") SolicitacaoTroca solicitacao, BindingResult result) {
+    public String salvar(@Valid @ModelAttribute("solicitacao") SolicitacaoTroca solicitacao, BindingResult result, Model model) {
         CadastroTreinador proponente = getTreinadorLogado();
         
-        // Asseguramos que o treinador solicitante é injetado antes da validação da JPA
         solicitacao.setTreinadorSolicitante(proponente); 
-        solicitacao.setDataSolicitacao(LocalDateTime.now()); 
+        if (solicitacao.getDataSolicitacao() == null) solicitacao.setDataSolicitacao(LocalDateTime.now()); 
         solicitacao.setStatusTroca(StatusTroca.PENDENTE); 
 
-        // CRÍTICO: Se a validação falhar, o Proponente e as listas são perdidos, precisamos re-injetá-los
         if (result.hasErrors()) {
-            logger.error("Erro de validação ao salvar solicitação: {}", result.getAllErrors()); // Loga os erros
-            
-            // Re-injeta todas as listas que foram adicionadas no método GET
-            result.getModel().put("nomeUsuario", proponente.getNome());
-            result.getModel().put("proponente", proponente);
-            result.getModel().put("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
-            result.getModel().put("todosTreinadores", treinadorRepo.findAll());
-            result.getModel().put("todosPokemons", pokemonRepo.findAll());
-            
-            // Recarrega as listas de apoio para evitar falhas no HTML
-            if (solicitacao.getPokemonSolicitado() != null) {
-                 result.getModel().put("interesseSelecionado", solicitacao.getPokemonSolicitado());
-                 result.getModel().put("receptorSelecionado", solicitacao.getTreinadorReceptor());
-            } else {
-                 result.getModel().put("todosInteresses", listaInteresseRepo.findAll());
-            }
-            
+            prepararModelParaFormulario(model, proponente);
             return "Solicitacao/formulario-solicitacao";
         }
         
         solicitacaoTrocaRepo.save(solicitacao);
-        logger.info("Solicitação de Troca salva com sucesso (ID: {})", solicitacao.getId());
         return "redirect:/solicitacoes";
+    }
+
+    // --- NOVOS MÉTODOS PARA ACEITAR/RECUSAR ---
+
+    @GetMapping("/{id}/aceitar")
+    @Transactional // Garante que todas as operações no banco ocorram juntas ou nenhuma ocorra
+    public String aceitarTroca(@PathVariable Long id) {
+        SolicitacaoTroca solicitacao = solicitacaoTrocaRepo.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Solicitação inválida"));
+            
+        // 1. Atualiza o Status
+        solicitacao.setStatusTroca(StatusTroca.ACEITA);
+        
+        // 2. Lógica de Troca (Swap) dos Pokémons
+        CadastroPokemon pokemonOferecido = solicitacao.getPokemonOferecido();
+        CadastroPokemon pokemonSolicitado = solicitacao.getPokemonSolicitado();
+        
+        CadastroTreinador solicitante = solicitacao.getTreinadorSolicitante();
+        CadastroTreinador receptor = solicitacao.getTreinadorReceptor(); // Quem está aceitando
+        
+        // A: O Receptor (quem aceitou) ganha o Pokémon Oferecido
+        pokemonOferecido.setTreinador(receptor);
+        pokemonRepo.save(pokemonOferecido);
+        
+        // B: O Solicitante (quem pediu) ganha o Pokémon Solicitado (se houver)
+        if (pokemonSolicitado != null) {
+            pokemonSolicitado.setTreinador(solicitante);
+            pokemonRepo.save(pokemonSolicitado);
+        }
+        
+        solicitacaoTrocaRepo.save(solicitacao);
+        return "redirect:/solicitacoes";
+    }
+
+    @GetMapping("/{id}/recusar")
+    @Transactional
+    public String recusarTroca(@PathVariable Long id) {
+        SolicitacaoTroca solicitacao = solicitacaoTrocaRepo.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Solicitação inválida"));
+            
+        solicitacao.setStatusTroca(StatusTroca.RECUSADA);
+        solicitacaoTrocaRepo.save(solicitacao);
+        
+        return "redirect:/solicitacoes";
+    }
+
+    private void prepararModelParaFormulario(Model model, CadastroTreinador proponente) {
+        model.addAttribute("nomeUsuario", proponente.getNome());
+        model.addAttribute("proponente", proponente);
+        model.addAttribute("meusPokemons", pokemonRepo.findByTreinadorId(proponente.getId()));
+        model.addAttribute("todosTreinadores", treinadorRepo.findAll()); 
+        model.addAttribute("todosPokemons", pokemonRepo.findAll());
+        model.addAttribute("todosInteresses", listaInteresseRepo.findAll());
     }
 }
