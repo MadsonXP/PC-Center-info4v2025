@@ -12,7 +12,16 @@
     <div class="alert alert-info" role="alert" th:if="${nomeUsuario}">
         Você está logado como **<span th:text="${nomeUsuario}">Usuário</span>**.
     </div>
+
+    <div th:if="${mensagemSucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${mensagemSucesso}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     
+    <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${mensagemErro}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <h1 class="mb-4">Gerenciar Solicitações de Troca</h1>
     
     <a th:href="@{/}" class="btn btn-secondary mb-3">Voltar ao Menu Principal</a>
@@ -84,6 +93,8 @@
         </tr>
         </tbody>
     </table>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </div>
 </body>
 </html>
